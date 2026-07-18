@@ -164,7 +164,9 @@ async function runFeature(mode, userText) {
       }
       catch (e) { 
         if (DEBUG) console.error('[DEBUG MAIN] Screenshot capture failed:', e);
-        send('status', { message: 'Screen capture needs permission — grant Screen Recording to cue in System Settings.' }); 
+        send('status', { message: process.platform === 'darwin'
+          ? 'Screen capture needs permission — grant Screen Recording to cue in System Settings.'
+          : 'Screen capture needs permission — allow screen/window capture when Windows prompts you.' }); 
       }
     }
 

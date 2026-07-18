@@ -1,7 +1,7 @@
 {
   "name": "cue",
   "version": "0.1.0",
-  "description": "Open-source macOS invisible AI overlay — three separate inputs (screen, mic, system audio) into an LLM. A Cluely-style copilot for meetings and coding problems.",
+  "description": "Open-source invisible AI overlay — three separate inputs (screen, mic, system audio) into an LLM. A Cluely-style copilot for meetings and coding problems.",
   "license": "GPL-3.0-or-later",
   "author": "cue",
   "main": "main.js",
@@ -9,7 +9,7 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --mac zip",
-    "dist:win": "electron-builder --win"
+    "dist:win": "electron-builder --win --x64"
   },
   "build": {
     "appId": "com.cue.overlay",
@@ -23,8 +23,9 @@
     ],
     "mac": {
       "target": [
-        "dir"
+        "zip"
       ],
+      "artifactName": "cue-mac-${arch}.${ext}",
       "category": "public.app-category.productivity",
       "hardenedRuntime": false,
       "gatekeeperAssess": false,
@@ -38,8 +39,17 @@
     },
     "win": {
       "target": [
-        "nsis"
-      ]
+        "nsis",
+        "zip"
+      ],
+      "artifactName": "cue-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "cue"
     }
   },
   "keywords": [

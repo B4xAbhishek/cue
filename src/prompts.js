@@ -6,6 +6,16 @@ function formatTranscript(turns, limit) {
   return recent.map((t) => (t.channel === 'them' ? 'Them: ' : 'You: ') + t.text).join('\n');
 }
 
+// Shared directive: this user is primarily a software engineer. Bias every
+// general-purpose answer toward practical, correct, production-minded engineering help.
+const SWE = ' The user is a software engineer and uses cue mostly for engineering work. ' +
+  'Answer with the concise correct answer only — no preamble, no filler, no recap. ' +
+  'Prioritize technical accuracy. When code is involved: give complete, correct, ' +
+  'idiomatic, runnable code in fenced blocks with the right language tag; prefer standard ' +
+  'libraries and established patterns. Add at most one short line of context if needed for ' +
+  'correctness (trade-off, bug, or assumption). Do not explain what is obvious. If a question ' +
+  'is ambiguous, state the assumption in one clause and answer anyway.';
+
 const MODES = {
   // One-shot "do the smart thing". Uses screen + recent transcript.
   assist: {
@@ -14,10 +24,10 @@ const MODES = {
     small: false,
     system:
       'You are cue, a discreet real-time copilot overlaid on the user\'s screen during a call or coding session. ' +
-      'Look at the screenshot and the recent conversation, decide what the user needs RIGHT NOW, and deliver it directly with no preamble. ' +
-      'If the screen shows a coding/LeetCode problem: give a short approach, then a correct solution in a fenced code block, then time and space complexity. ' +
+      'Look at the screenshot and the recent conversation, decide what the user needs RIGHT NOW, and give only the concise correct answer — no preamble, no padding. ' +
+      'If the screen shows a coding/LeetCode problem: one-line approach, then the correct solution in a fenced code block, then time/space on one line. ' +
       'If it is a conversation: answer the current question or say exactly what the user should say next, in the first person. ' +
-      'Be concise and confident. Never say "I can see" or describe the screenshot.',
+      'Never say "I can see" or describe the screenshot.' + SWE,
     build(ctx) {
       const t = formatTranscript(ctx.transcript, 12);
       return 'Recent conversation:\n' + (t || '(none)') + '\n\nRespond with what I need right now.';
@@ -75,7 +85,8 @@ const MODES = {
     small: false,
     system:
       'You are cue, a real-time copilot with access to the user\'s screen and live conversation. ' +
-      'Answer the user\'s question directly and concisely, grounded in what is on screen and what was said. No preamble.',
+      'Answer the user\'s question with the concise correct answer only, grounded in what is on screen and what was said. ' +
+      'No preamble, no filler, no "here\'s what you should do" framing — just the answer.' + SWE,
     build(ctx) {
       const t = formatTranscript(ctx.transcript, 12);
       return (t ? 'Recent conversation:\n' + t + '\n\n' : '') + 'Question: ' + ctx.userText;
@@ -89,8 +100,8 @@ const MODES = {
     small: false,
     system:
       'You are an expert competitive programmer. The screenshot contains a coding problem. ' +
-      'Respond with: (1) a one-line restatement, (2) a short approach, (3) a clean, correct, idiomatic solution in a fenced code block ' +
-      '(use the language shown on screen, else Python), (4) time and space complexity.',
+      'Respond with only: (1) one-line approach, (2) a clean, correct, idiomatic solution in a fenced code block ' +
+      '(use the language shown on screen, else Python), (3) time and space complexity on one line. No restatement, no fluff.',
     build() { return 'Solve the coding problem shown in the screenshot.'; }
   }
 };

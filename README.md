@@ -45,10 +45,15 @@ There are two ways to install cue. **If you're not a developer, use Option A.**
 
 ### Option A — Download the app (easiest)
 
-1. Go to the [**Releases**](../../releases) page and download **`cue-mac.zip`**.
-2. Double-click the zip to unzip it. You'll get **`cue.app`**.
-3. Drag **`cue.app`** into your **Applications** folder.
-4. **First open (important):** because cue is a free app without a paid Apple certificate, macOS will refuse to open it normally the first time. Do this once:
+1. Go to the [**Releases**](../../releases) page and download the build for your OS:
+   - **macOS:** `cue-mac-arm64.zip` or `cue-mac-x64.zip`
+   - **Windows:** `cue-win-x64.exe` (installer) or `cue-win-x64.zip` (portable)
+
+#### macOS
+
+1. Double-click the zip to unzip it. You'll get **`cue.app`**.
+2. Drag **`cue.app`** into your **Applications** folder.
+3. **First open (important):** because cue is a free app without a paid Apple certificate, macOS will refuse to open it normally the first time. Do this once:
    - **Right-click** `cue.app` → **Open** → click **Open** in the dialog.
    - If macOS instead says **"cue is damaged and can't be opened,"** open the **Terminal** app and paste this line, then press Return:
      ```bash
@@ -58,22 +63,32 @@ There are two ways to install cue. **If you're not a developer, use Option A.**
 
 After that, cue opens normally forever.
 
+#### Windows
+
+1. Run **`cue-win-x64.exe`** and finish the installer (or unzip the portable zip).
+2. On first launch, allow **microphone** and **screen/window capture** when Windows prompts you (needed for meeting audio + Assist).
+3. If SmartScreen warns that the app is unrecognized, choose **More info → Run anyway** (the release is unsigned unless a code-signing cert is configured).
+
 ### Option B — Run from source (developers)
 
 You need [Node.js](https://nodejs.org) 18+ installed. No Xcode required.
 
 ```bash
-git clone https://github.com/Blueturboguy07/cue.git
+git clone https://github.com/B4xAbhishek/cue.git
 cd cue
 npm install
 npm start
 ```
 
-To build your own `cue.app`:
+To build installers locally:
 ```bash
-npm run pack      # creates dist/mac-arm64/cue.app
+npm run dist       # macOS → dist/cue-mac-*.zip
+npm run dist:win   # Windows → dist/cue-win-x64.exe (+ zip); run on Windows or CI
+npm run pack       # unpackaged dir build (dev)
 ```
-> Note: the packaged app is **ad-hoc signed** (no paid Apple certificate). macOS ties permission grants to the exact build, so **rebuilding resets the mic/screen permissions** — you'll grant them again. For everyday use, build once and keep it.
+> Note (macOS): the packaged app is **ad-hoc signed** (no paid Apple certificate). macOS ties permission grants to the exact build, so **rebuilding resets the mic/screen permissions** — you'll grant them again. For everyday use, build once and keep it.
+
+Tagged releases (`v*`) are built by GitHub Actions and publish **macOS + Windows** artifacts automatically.
 
 ---
 
@@ -179,12 +194,17 @@ Issues and PRs welcome. cue is intentionally small and readable — `main.js` (a
 
 ### Platform Support
 - [x] **macOS** (Fully Supported)
-- [x] **Windows** (Fully Supported)
+- [x] **Windows** (Supported — installer shipped via Releases)
 - [ ] **Linux** (Untested)
+- [ ] **Android** (Not planned as an Electron port — see notes below)
+
+**Android:** cue’s core product depends on a desktop overlay, global hotkeys, system-audio loopback, and hide-from-capture window flags. Those do not map cleanly to Android (no Electron runtime; system audio / “invisible in share” are heavily restricted). A real Android app would be a separate native rewrite with a narrower feature set (e.g. screenshot + mic assist), not a packaging target of this repo.
 
 ### Features Open for Contribution
 - [ ] Upgrade audio capture pipeline for zero-latency streaming
 - [ ] Add optional Deepgram support for ultra-fast transcription
+- [ ] Harden Windows hide-from-capture + SmartScreen / code signing
+- [ ] Explore a limited Android companion (screenshot + ask) if demand is clear
 
 ## Credits & license
 
